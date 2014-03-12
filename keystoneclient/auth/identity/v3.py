@@ -128,6 +128,10 @@ class Auth(base.BaseIdentityPlugin):
         if method_kwargs.get('password'):
             methods.append(PasswordMethod(**method_kwargs))
 
+        method_kwargs = TfaMethod._extract_kwargs(kwargs)
+        if method_kwargs.get('tfa_password'):
+            methods.append(TfaMethod(**method_kwargs))
+
         method_kwargs = TokenMethod._extract_kwargs(kwargs)
         if method_kwargs.get('token'):
             methods.append(TokenMethod(**method_kwargs))
@@ -232,6 +236,45 @@ class PasswordMethod(AuthMethod):
                 user['domain'] = {'name': self.user_domain_name}
 
         return 'password', {'user': user}
+
+
+class TfaMethod(AuthMethod):
+
+    method_parameters = ['user_id',
+                         'username',
+                         'user_domain_id',
+                         'user_domain_name',
+                         'password',
+                         'tfa_password']
+
+    def __init__(self, **kwargs):
+        """Construct a User/Password/Tfa-password based authentication method.
+
+        :param string password: Password for authentication.
+        :param string username: Username for authentication.
+        :param string user_id: User ID for authentication.
+        :param string user_domain_id: User's domain ID for authentication.
+        :param string user_domain_name: User's domain name for authentication.
+        :param string tfa_password: the second-factor password given by the
+                                    user's TFA client.
+        """
+        super(TfaMethod, self).__init__(**kwargs)
+
+    def get_auth_data(self, headers=None):
+        user = {'password': self.password,
+                'tfa_password': self.tfa_password}
+
+        if self.user_id:
+            user['id'] = self.user_id
+        elif self.username:
+            user['name'] = self.username
+
+            if self.user_domain_id:
+                user['domain'] = {'id': self.user_domain_id}
+            elif self.user_domain_name:
+                user['domain'] = {'name': self.user_domain_name}
+
+        return 'tfa_password', {'user': user}
 
 
 class Password(_AuthConstructor):

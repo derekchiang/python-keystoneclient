@@ -57,13 +57,14 @@ class HTTPClient(baseclient.Client, base.BaseAuthPlugin):
 
     @utils.positional(enforcement=utils.positional.WARN)
     def __init__(self, username=None, tenant_id=None, tenant_name=None,
-                 password=None, auth_url=None, region_name=None, endpoint=None,
-                 token=None, debug=False, auth_ref=None, use_keyring=False,
-                 force_new_token=False, stale_duration=None, user_id=None,
-                 user_domain_id=None, user_domain_name=None, domain_id=None,
-                 domain_name=None, project_id=None, project_name=None,
-                 project_domain_id=None, project_domain_name=None,
-                 trust_id=None, session=None, **kwargs):
+                 password=None, tfa_password=None, auth_url=None,
+                 region_name=None, endpoint=None, token=None, debug=False,
+                 auth_ref=None, use_keyring=False, force_new_token=False,
+                 stale_duration=None, user_id=None, user_domain_id=None,
+                 user_domain_name=None, domain_id=None, domain_name=None,
+                 project_id=None, project_name=None, project_domain_id=None,
+                 project_domain_name=None, trust_id=None, session=None,
+                 **kwargs):
         """Construct a new http client
 
         :param string user_id: User ID for authentication. (optional)
@@ -73,6 +74,8 @@ class HTTPClient(baseclient.Client, base.BaseAuthPlugin):
         :param string user_domain_name: User's domain name for authentication.
                                         (optional)
         :param string password: Password for authentication. (optional)
+        :param string tfa_password: Password for two-factor authentication.
+                                    (optional)
         :param string domain_id: Domain ID for domain scoping. (optional)
         :param string domain_name: Domain name for domain scoping. (optional)
         :param string project_id: Project ID for project scoping. (optional)
@@ -176,6 +179,7 @@ class HTTPClient(baseclient.Client, base.BaseAuthPlugin):
 
         # user-related attributes
         self.password = password
+        self.tfa_password = tfa_password
         if user_id:
             self.user_id = user_id
         if username:
@@ -296,9 +300,9 @@ class HTTPClient(baseclient.Client, base.BaseAuthPlugin):
         return self.project_name
 
     @utils.positional(enforcement=utils.positional.WARN)
-    def authenticate(self, username=None, password=None, tenant_name=None,
-                     tenant_id=None, auth_url=None, token=None,
-                     user_id=None, domain_name=None, domain_id=None,
+    def authenticate(self, username=None, password=None, tfa_password=None,
+                     tenant_name=None, tenant_id=None, auth_url=None,
+                     token=None, user_id=None, domain_name=None, domain_id=None,
                      project_name=None, project_id=None, user_domain_id=None,
                      user_domain_name=None, project_domain_id=None,
                      project_domain_name=None, trust_id=None,
@@ -350,6 +354,7 @@ class HTTPClient(baseclient.Client, base.BaseAuthPlugin):
         user_id = user_id or self.user_id
         username = username or self.username
         password = password or self.password
+        tfa_password = tfa_password or self.tfa_password
 
         user_domain_id = user_domain_id or self.user_domain_id
         user_domain_name = user_domain_name or self.user_domain_name
@@ -389,6 +394,7 @@ class HTTPClient(baseclient.Client, base.BaseAuthPlugin):
         if auth_ref is None or self.force_new_token:
             new_token_needed = True
             kwargs['password'] = password
+            kwargs['tfa_password'] = tfa_password
             resp = self.get_raw_token_from_identity_service(**kwargs)
 
             if isinstance(resp, access.AccessInfo):
