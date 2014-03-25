@@ -180,3 +180,8 @@ class UserManager(base.CrudManager):
     def delete(self, user):
         return super(UserManager, self).delete(
             user_id=base.getid(user))
+
+    def reset_tfa_password(self, user):
+        return super(UserManager, self)._patch(
+            '/tfa/reset_secret/%s' % user.id,
+            body=None, respond_key='secret')

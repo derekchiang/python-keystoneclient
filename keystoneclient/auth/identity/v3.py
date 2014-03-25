@@ -274,7 +274,7 @@ class TfaMethod(AuthMethod):
             elif self.user_domain_name:
                 user['domain'] = {'name': self.user_domain_name}
 
-        return 'tfa_password', {'user': user}
+        return 'tfa', {'user': user}
 
 
 class Password(_AuthConstructor):
