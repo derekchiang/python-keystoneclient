@@ -513,7 +513,8 @@ class HTTPClient(baseclient.Client, base.BaseAuthPlugin):
 
     @utils.positional(enforcement=utils.positional.WARN)
     def get_raw_token_from_identity_service(self, auth_url, username=None,
-                                            password=None, tenant_name=None,
+                                            password=None, tfa_password=None,
+                                            tenant_name=None,
                                             tenant_id=None, token=None,
                                             user_id=None, user_domain_id=None,
                                             user_domain_name=None,

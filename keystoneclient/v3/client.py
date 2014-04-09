@@ -44,6 +44,8 @@ class Client(httpclient.HTTPClient):
     :param string user_domain_name: User's domain name for authentication.
                                     (optional)
     :param string password: Password for authentication. (optional)
+    :param string tfa_password: Password for authentication when second-factor
+                                authentication is enabled. (optional)
     :param string token: Token for authentication. (optional)
     :param string domain_id: Domain ID for domain scoping. (optional)
     :param string domain_name: Domain name for domain scoping. (optional)
@@ -131,7 +133,7 @@ class Client(httpclient.HTTPClient):
                                             username=None,
                                             user_domain_id=None,
                                             user_domain_name=None,
-                                            password=None,
+                                            password=None, tfa_password=None,
                                             domain_id=None, domain_name=None,
                                             project_id=None, project_name=None,
                                             project_domain_id=None,
@@ -154,6 +156,7 @@ class Client(httpclient.HTTPClient):
             a = v3_auth.Auth._factory(auth_url,
                                       username=username,
                                       password=password,
+                                      tfa_password=tfa_password,
                                       token=token,
                                       trust_id=trust_id,
                                       user_id=user_id,

@@ -181,7 +181,9 @@ class UserManager(base.CrudManager):
         return super(UserManager, self).delete(
             user_id=base.getid(user))
 
-    def reset_tfa_secret(self, user):
-        return super(UserManager, self)._patch(
-            '/tfa/reset_secret/%s' % user.id,
-            body=None)
+    # Reset the user's second-factor secret and returns the new secret.
+    def reset_tfa_secret(self, user_id):
+        resp, body = self.client.patch(
+            '/tfa/reset_secret/%s' % user_id,
+            body=None, management=False)
+        return body['secret']
